@@ -1,0 +1,12 @@
+services:
+
+  node2:
+    build:
+      context: ../../
+      dockerfile: docker/project_shadow/node2_pkg/Dockerfile
+      
+  node1:
+    build:
+      context: ../../
+      dockerfile: docker/project_shadow/node1_pkg/Dockerfile
+
