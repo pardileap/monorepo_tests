@@ -1,0 +1,40 @@
+ARG ISAACSIM_VERSION=4.0.0
+FROM leapaidevcr.azurecr.io/shadow/sim-base:${ISAACSIM_VERSION}
+
+ENV TZ=Europe/UTC
+ARG ROS_DISTRO=iron
+ENV ROS_DISTRO=$ROS_DISTRO
+ENV SHELL=/bin/bash
+
+# TODO: Set user to non-root
+# ROS2 install
+RUN apt-get update && apt-get install software-properties-common -y
+RUN add-apt-repository universe
+RUN apt-get update && apt-get install curl -y
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install ros-dev-tools ros-$ROS_DISTRO-desktop -y
+RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash' >> /root/.bashrc
+
+# IsaacLab install
+RUN apt-get update && apt-get install ncurses-term -y
+RUN git clone -b v1.0.0 https://github.com/isaac-sim/IsaacLab.git /isaac-lab
+RUN ln -s /isaac-sim /isaac-lab/_isaac_sim
+RUN /isaac-lab/isaaclab.sh --install
+
+# Install dependencies
+RUN /isaac-sim/python.sh -m pip install opencv-python pytest lark
+
+# Install packages
+RUN apt-get update && apt-get install -y \
+    sudo \
+    bash-completion \
+    vim
+
+# Add symlink
+RUN ln -s /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples /isaac-sim/extension_examples
+
+# Temporarily fix robot assembler bug. This should be gone when bug is fixed in new version.
+COPY bug_fix/robot_assembler.py /isaac-sim/exts/omni.isaac.robot_assembler/omni/isaac/robot_assembler/
+
+CMD ["/bin/bash"]

@@ -1,0 +1,38 @@
+{
+    "name": "Simulation Container",
+    "build": {
+        "dockerfile": "../docker/Dockerfile",
+        "args": {
+            "USERNAME": "${localEnv:USERNAME}"
+        }
+    },
+    "workspaceFolder": "/home/${localEnv:USERNAME}/sim_ws",
+    "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions":[
+                // add any extensions here
+			]
+        }
+    },
+    "containerEnv": {
+        "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "ACCEPT_EULA": "Y"
+    },
+    "runArgs": [
+        "--net=host",
+        "--gpus", "all",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache:rw",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/cache/ov:/root/.cache/ov:rw",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/cache/pip:/root/.cache/pip:rw",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/cache/glcache:/root/.cache/nvidia/GLCache:rw",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/cache/computecache:/root/.nv/ComputeCache:rw",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs:rw",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/data:/root/.local/share/ov/data:rw",
+        "-v", "/home/${localEnv:USERNAME}/docker/isaac-sim/documents:/root/Documents:rw"
+    ],
+    "mounts": [
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+    ]
+}
