@@ -1,0 +1,12 @@
+{
+    "libs" : {
+            "robot_control": {
+                "version": "v0.0.1",
+                "type": "modules"
+            },
+            "simulation": {
+                "version": "v0.0.1",
+                "type": "modules"
+            }
+    }
+}
